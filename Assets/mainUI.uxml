@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
+        <ui:VisualElement style="flex-grow: 1; background-color: rgba(255, 88, 88, 0); height: 80px; flex-direction: row-reverse; max-height: 80px; width: auto; max-width: 400px; justify-content: center; align-items: center;">
+            <ui:VisualElement name="nextCatPreview" style="flex-grow: 1; width: 55px; height: 55px; max-width: 55px; max-height: 55px; background-color: rgb(0, 0, 0); padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" />
+            <ui:Label tabindex="-1" text="Next" parse-escape-sequences="true" display-tooltip-when-elided="true" name="nextCatLabel" style="width: auto;" />
+            <ui:VisualElement style="flex-grow: 1;">
+                <ui:Label tabindex="-1" text="Label" parse-escape-sequences="true" display-tooltip-when-elided="true" name="scoreLabel" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="gameOverPanel" style="flex-grow: 1; background-color: rgb(73, 129, 183); position: absolute; left: 0; top: 0; bottom: 50%; width: 100%; right: 50%; flex-direction: row; justify-content: center; align-self: center; align-items: center; display: none;">
+        <ui:Label tabindex="-1" text="Game Over" parse-escape-sequences="true" display-tooltip-when-elided="true" />
+    </ui:VisualElement>
+</ui:UXML>
