@@ -26,7 +26,7 @@ public class ObjectSpawner : MonoBehaviour
         screenRightLimit = cam.ScreenToWorldPoint(new Vector3(Screen.width, 0, 0)).x - 0.5f;
 
         // Spawn konumunu biraz aşağıya ayarla
-        spawnPosition = new Vector3(0f, 3.5f, 0f); // Y değeri ayarlandı
+        spawnPosition = new Vector3(0f, 30.5f, 0f); // Y değeri ayarlandı
 
         // İlk rastgele bir sonraki nesneyi seç
         nextObjectIndex = Random.Range(0, objects.Length);
@@ -48,11 +48,17 @@ public class ObjectSpawner : MonoBehaviour
                 HandleKeyboardInput();
             }
 
-            // Düşüş Hattı
+            // DropLine pozisyonunu güncelle
             dropLine.SetPosition(0, spawnPosition);
-            dropLine.SetPosition(1, new Vector3(spawnPosition.x, -5f, 0));
+            dropLine.SetPosition(1, new Vector3(spawnPosition.x, -1.75f, 1));
+        }
+        else
+        {
+            // Eğer bir nesne bırakılmışsa, DropLine’ı gizle
+            dropLine.enabled = false;
         }
     }
+
 
     void HandleMobileInput()
     {
@@ -97,14 +103,14 @@ public class ObjectSpawner : MonoBehaviour
     void DropObject()
     {
         currentObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
-        dropLine.enabled = false;
+       // dropLine.enabled = false;
         currentObject = null;
         Invoke(nameof(SpawnNewObject), 1f); // Yeni nesneyi çağır
     }
 
     void SpawnNewObject()
     {
-        spawnPosition.y = 3.5f; // Nesne biraz aşağıdan başlar
+        spawnPosition.y = 5.5f; // Nesne biraz aşağıdan başlar
 
         // Bir sonraki nesneyi spawn et
         currentObject = Instantiate(objects[nextObjectIndex], spawnPosition, Quaternion.identity);
@@ -113,7 +119,13 @@ public class ObjectSpawner : MonoBehaviour
         // Yeni bir sonraki nesneyi rastgele seç
         nextObjectIndex = Random.Range(0, objects.Length);
 
+        // DropLine'ı yeniden etkinleştir ve yeni pozisyonu ayarla
+        dropLine.enabled = true;
+       // dropLine.SetPosition(0, spawnPosition);
+       // dropLine.SetPosition(1, new Vector3(spawnPosition.x, -5f, 0));
+
         // UI'yi güncelle
         FindObjectOfType<UIManager>().UpdateNextCatUI(objects[nextObjectIndex]);
     }
+
 }

@@ -11,15 +11,23 @@ public class FallingObject : MonoBehaviour
     private FallingObject otherObject;
     public bool isFalling = true;
     private float fallTimer = 10f;  // Düşme süresi (2 saniye)
+    public AudioClip mergeSound; // Birleşme sırasında çalınacak ses
+    private bool hasPlayedGroundSound = false;
+   
 
     private void Start()
     {
+    
         // Objeler ilk başta düşüyor olarak ayarlanır
         isFalling = true;
+        
+      
     }
     
     private void Update()
     {
+        
+        
         // Zamanlayıcıyı azalt
         if (isFalling)
         {
@@ -41,6 +49,8 @@ public class FallingObject : MonoBehaviour
             isCollidingWithSameSize = true;
             collisionStartTime = Time.time; // Çarpışma başlangıç zamanı
         }
+        
+      
     }
 
     private void OnCollisionStay2D(Collision2D collision)
@@ -55,6 +65,9 @@ public class FallingObject : MonoBehaviour
                 MergeObjects(otherObject);
             }
         }
+        
+        
+        
     }
 
     private void OnCollisionExit2D(Collision2D collision)
@@ -70,6 +83,7 @@ public class FallingObject : MonoBehaviour
 
     private void MergeObjects(FallingObject other)
     {
+        
         // Eğer bir üst sınıf obje varsa birleşme gerçekleşir
         if (nextObjectPrefab != null)
         {
@@ -81,6 +95,14 @@ public class FallingObject : MonoBehaviour
             {
                 Instantiate(explosionPrefab, mergePos, Quaternion.identity);
             }
+
+
+            AudioManager.Instance.PlaySound(mergeSound);
+            
+#if UNITY_ANDROID || UNITY_IOS
+            Handheld.Vibrate();
+#endif
+
 
             // Yeni objeyi oluştur
             Instantiate(nextObjectPrefab, mergePos, Quaternion.identity);
@@ -109,4 +131,8 @@ public class FallingObject : MonoBehaviour
     {
         return (int)Mathf.Pow(2, currentSize + 2); // Örneğin size=1 -> 5, size=2 -> 10, size=3 -> 20
     }
+    
+    
+
+   
 }

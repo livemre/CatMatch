@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -5,11 +6,16 @@ public class UIManager : MonoBehaviour
 
 {
     public static UIManager Instance;
-    public GameObject[] catPrefabs; // Tüm kedi prefab'leri
+    //public GameObject[] catPrefabs; // Tüm kedi prefab'leri
 
     private VisualElement nextCatPreview; // Bir sonraki kedinin önizlemesini gösterecek alan
     private Label scoreLabel; // Skoru gösterecek Label
     private VisualElement gameOverPanel;
+    private Dictionary<GameObject, Texture2D> prefabImageMap; // Eşleştirme
+    
+    // Prefab ve görselleri eşleştirmek için bir Dictionary
+    public List<GameObject> catPrefabs; // Kedilere ait prefab listesi
+    public List<Texture2D> catImages; // Kedilere ait resimler
 
     private int score = 0; // Oyuncunun puanı
 
@@ -26,32 +32,50 @@ public class UIManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
     void Start()
+
+
     {
-        // UIDocument içindeki VisualElement kökünü alın
-        var uiDocument = GetComponent<UIDocument>();
-        var root = uiDocument.rootVisualElement;
-
-        // UI'deki elemanları bulun
-        nextCatPreview = root.Q<VisualElement>("nextCatPreview");
-        scoreLabel = root.Q<Label>("scoreLabel");
-        gameOverPanel = root.Q<VisualElement>("gameOverPanel");
-
-        // Debug: Kontrol amaçlı log ekleyin
-        if (nextCatPreview == null)
-            Debug.LogError("nextCatPreview adında bir VisualElement bulunamadı. UXML dosyasını kontrol edin.");
         
-        if (scoreLabel == null)
-            Debug.LogError("scoreLabel adında bir Label bulunamadı. UXML dosyasını kontrol edin.");
+      
 
-        // Başlangıçta skor UI'yi güncelle
-        UpdateScoreUI();
+        // Prefab ve görselleri eşleştir
+        prefabImageMap = new Dictionary<GameObject, Texture2D>();
+
+        for (int i = 0; i < catPrefabs.Count; i++)
+        {
+            if (i < catImages.Count)
+            {
+                prefabImageMap[catPrefabs[i]] = catImages[i];
+            }
+            else
+            {
+                Debug.LogWarning($"Prefab '{catPrefabs[i].name}' için bir görsel tanımlanmamış.");
+            }
+
+
+            // UIDocument içindeki VisualElement kökünü alın
+            var uiDocument = GetComponent<UIDocument>();
+            var root = uiDocument.rootVisualElement;
+
+            // UI'deki elemanları bulun
+            nextCatPreview = root.Q<VisualElement>("nextCatPreview");
+            scoreLabel = root.Q<Label>("scoreLabel");
+            gameOverPanel = root.Q<VisualElement>("gameOverPanel");
+
+            // Debug: Kontrol amaçlı log ekleyin
+            if (nextCatPreview == null)
+                Debug.LogError("nextCatPreview adında bir VisualElement bulunamadı. UXML dosyasını kontrol edin.");
+
+            if (scoreLabel == null)
+                Debug.LogError("scoreLabel adında bir Label bulunamadı. UXML dosyasını kontrol edin.");
+
+            // Başlangıçta skor UI'yi güncelle
+            UpdateScoreUI();
+        }
     }
 
-    /// <summary>
-    /// Bir sonraki kedi önizlemesini günceller.
-    /// </summary>
-    /// <param name="nextCatPrefab">Bir sonraki kedinin prefab'i.</param>
     public void UpdateNextCatUI(GameObject nextCatPrefab)
     {
         // Null kontrolü
@@ -62,17 +86,16 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        // Kedinin SpriteRenderer bileşenini kontrol et
-        var spriteRenderer = nextCatPrefab.GetComponent<SpriteRenderer>();
-        if (spriteRenderer != null)
+        // Prefab'e bağlı görseli kontrol et
+        if (prefabImageMap.TryGetValue(nextCatPrefab, out Texture2D image))
         {
-            // Kedinin sprite'ını arka plan olarak UI'de göster
-            nextCatPreview.style.backgroundImage = new StyleBackground(spriteRenderer.sprite.texture);
+            // Görseli UI'ye ekle
+            nextCatPreview.style.backgroundImage = new StyleBackground(image);
         }
         else
         {
-            // SpriteRenderer bulunamazsa uyarı ver
-            Debug.LogWarning($"Prefab '{nextCatPrefab.name}' için SpriteRenderer bulunamadı.");
+            // Görsel bulunamazsa uyarı ver
+            Debug.LogWarning($"Prefab '{nextCatPrefab.name}' için bir görsel bulunamadı.");
             nextCatPreview.style.backgroundImage = null;
         }
     }
@@ -94,7 +117,7 @@ public class UIManager : MonoBehaviour
     {
         if (scoreLabel != null)
         {
-            scoreLabel.text = $"Score: {score}";
+            scoreLabel.text = score.ToString();
         }
     }
     
