@@ -100,7 +100,7 @@ public class FallingObject : MonoBehaviour
             AudioManager.Instance.PlaySound(mergeSound);
             
 #if UNITY_ANDROID || UNITY_IOS
-            Handheld.Vibrate();
+            Taptic.Success();
 #endif
 
 
