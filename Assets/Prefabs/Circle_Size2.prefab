@@ -214,7 +214,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d50e21fbf17b441792a43963ca88c22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  size: 2
+  size: 11
   nextObjectPrefab: {fileID: 5991249177033785314, guid: dad9278ca396a40eb8f2824948b3f4fe, type: 3}
   explosionPrefab: {fileID: 9036256428114254407, guid: 46e39a3b0d0f244d5a019a4eef024daa, type: 3}
   isFalling: 1
