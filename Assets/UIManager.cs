@@ -10,8 +10,9 @@ public class UIManager : MonoBehaviour
 
     private VisualElement nextCatPreview; // Bir sonraki kedinin önizlemesini gösterecek alan
     private Label scoreLabel; // Skoru gösterecek Label
-    private VisualElement gameOverPanel;
+    private VisualElement gameOver;
     private Dictionary<GameObject, Texture2D> prefabImageMap; // Eşleştirme
+    private Button restartButton;
     
     // Prefab ve görselleri eşleştirmek için bir Dictionary
     public List<GameObject> catPrefabs; // Kedilere ait prefab listesi
@@ -62,7 +63,8 @@ public class UIManager : MonoBehaviour
             // UI'deki elemanları bulun
             nextCatPreview = root.Q<VisualElement>("nextCatPreview");
             scoreLabel = root.Q<Label>("scoreLabel");
-            gameOverPanel = root.Q<VisualElement>("gameOverPanel");
+            gameOver = root.Q<VisualElement>("gameOver");
+            restartButton = root.Q<Button>("restartButton");
 
             // Debug: Kontrol amaçlı log ekleyin
             if (nextCatPreview == null)
@@ -73,6 +75,11 @@ public class UIManager : MonoBehaviour
 
             // Başlangıçta skor UI'yi güncelle
             UpdateScoreUI();
+            
+            restartButton.clicked += () =>
+            {
+                gameOver.style.display = DisplayStyle.None;
+                GameManager.Instance.RestartGame();};
         }
     }
 
@@ -123,22 +130,31 @@ public class UIManager : MonoBehaviour
     
     public void GameOver()
     {
-        Debug.Log("Oyun Bitti!");
+        Debug.Log("Oyun Bitti yarrrak burası UI!");
+        
+        gameOver.style.display = DisplayStyle.Flex;
+        
+       
 
-        // Oyunu durdur
-       // Time.timeScale = 0f;
+       //  // Oyunu durdur
+       // // Time.timeScale = 0f;
+       //
+       //  // UI üzerinde Game Over mesajını göster
+       //  var uiDocument = FindObjectOfType<UIDocument>();
+       //  var root = uiDocument.rootVisualElement;
+       //  var gameOverLabel = root.Q<Label>("gameOverLabel");
+       //
+       //  if (gameOverLabel != null)
+       //  {
+       //      gameOverLabel.text = "Game Over!";
+       //      gameOverLabel.style.display = DisplayStyle.Flex;
+       //      gameOverPanel.style.display = DisplayStyle.Flex;
+       //      gameOverPanel.style.backgroundColor = Color.black;
+       //  }
+    }
 
-        // UI üzerinde Game Over mesajını göster
-        var uiDocument = FindObjectOfType<UIDocument>();
-        var root = uiDocument.rootVisualElement;
-        var gameOverLabel = root.Q<Label>("gameOverLabel");
-
-        if (gameOverLabel != null)
-        {
-            gameOverLabel.text = "Game Over!";
-            gameOverLabel.style.display = DisplayStyle.Flex;
-            gameOverPanel.style.display = DisplayStyle.Flex;
-            gameOverPanel.style.backgroundColor = Color.black;
-        }
+    public void ResetScore()
+    {
+        score = 0;
     }
 }

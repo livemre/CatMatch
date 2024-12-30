@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Linq; // Sahnedeki objeleri filtrelemek için
 
 public class ObjectSpawner : MonoBehaviour
 {
@@ -59,9 +60,10 @@ public class ObjectSpawner : MonoBehaviour
         }
     }
 
-
     void HandleMobileInput()
     {
+        float sensitivity = 0.005f; // Parmağın hareketine hassasiyet. Daha küçük bir değer hareketi yavaşlatır.
+
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
@@ -74,7 +76,8 @@ public class ObjectSpawner : MonoBehaviour
             else if (touch.phase == TouchPhase.Moved && isDragging)
             {
                 // Parmağın hareketi sırasında objeyi sağa sola taşı
-                spawnPosition.x = Mathf.Clamp(spawnPosition.x + touch.deltaPosition.x * Time.deltaTime, screenLeftLimit, screenRightLimit);
+                float moveAmount = touch.deltaPosition.x * sensitivity; // Hareket miktarını hassasiyetle kontrol et
+                spawnPosition.x = Mathf.Clamp(spawnPosition.x + moveAmount, screenLeftLimit, screenRightLimit);
                 currentObject.transform.position = spawnPosition;
             }
             else if (touch.phase == TouchPhase.Ended)
@@ -85,6 +88,7 @@ public class ObjectSpawner : MonoBehaviour
             }
         }
     }
+
 
     void HandleKeyboardInput()
     {
@@ -103,29 +107,54 @@ public class ObjectSpawner : MonoBehaviour
     void DropObject()
     {
         currentObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
-       // dropLine.enabled = false;
         currentObject = null;
         Invoke(nameof(SpawnNewObject), 1f); // Yeni nesneyi çağır
     }
 
+    
+   
+
     void SpawnNewObject()
     {
+        
+        // Eğer oyun bitti ise obje spawnlanmasın
+        if (GameManager.Instance.isGameOver)
+        {
+            Debug.Log("Oyun bitti, yeni obje spawnlanmayacak.");
+            return;
+        }
+        
+        
+        // Sahnedeki kedilerin en yüksek seviyesini kontrol et
+        int maxLevel = GameObject.FindGameObjectsWithTag("Cat")
+            .Select(cat => cat.GetComponent<FallingObject>().size)
+            .DefaultIfEmpty(0) // Eğer sahnede kedi yoksa 0 döner
+            .Max();
+
+        // Spawn edilecek nesneyi belirle
+        if (maxLevel >= 9)
+        {
+            nextObjectIndex = Random.Range(0, 5); // Element1, Element2, Element3, Element4 veya Element5
+        }
+        else if (maxLevel >= 7)
+        {
+            nextObjectIndex = Random.Range(0, 4); // Element1, Element2, Element3 veya Element4
+        }
+        else
+        {
+            nextObjectIndex = Random.Range(0, 3); // Element1, Element2 veya Element3
+        }
+
         spawnPosition.y = 5.5f; // Nesne biraz aşağıdan başlar
 
-        // Bir sonraki nesneyi spawn et
+        // Yeni nesneyi spawn et
         currentObject = Instantiate(objects[nextObjectIndex], spawnPosition, Quaternion.identity);
         currentObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
 
-        // Yeni bir sonraki nesneyi rastgele seç
-        nextObjectIndex = Random.Range(0, objects.Length);
-
         // DropLine'ı yeniden etkinleştir ve yeni pozisyonu ayarla
         dropLine.enabled = true;
-       // dropLine.SetPosition(0, spawnPosition);
-       // dropLine.SetPosition(1, new Vector3(spawnPosition.x, -5f, 0));
 
         // UI'yi güncelle
         FindObjectOfType<UIManager>().UpdateNextCatUI(objects[nextObjectIndex]);
     }
-
 }

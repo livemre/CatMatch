@@ -10,7 +10,7 @@ public class FallingObject : MonoBehaviour
     private float collisionStartTime = 0f;
     private FallingObject otherObject;
     public bool isFalling = true;
-    private float fallTimer = 10f;  // Düşme süresi (2 saniye)
+   
     public AudioClip mergeSound; // Birleşme sırasında çalınacak ses
     private bool hasPlayedGroundSound = false;
    
@@ -24,33 +24,26 @@ public class FallingObject : MonoBehaviour
       
     }
     
-    private void Update()
-    {
-        
-        
-        // Zamanlayıcıyı azalt
-        if (isFalling)
-        {
-            fallTimer -= Time.deltaTime;
-
-            // 2 saniye geçtiyse düşmeyi bitmiş kabul et
-            if (fallTimer <= 0f)
-            {
-                isFalling = false;
-            }
-        }
-    }
+  
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        // Eğer objenin tag'i "Ground" ise isFalling'i false yap
+        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Cat"))
+        {
+            if (isFalling)
+            {
+                isFalling = false;
+                Debug.Log($"{gameObject.name} yere ya da bir kediye çarptı, isFalling artık false!");
+            }
+        }
+
+        // Eğer çarpan obje bir FallingObject ise ve aynı boyuttaysa birleşme kontrolü
         otherObject = collision.gameObject.GetComponent<FallingObject>();
         if (otherObject != null && otherObject.size == size)
         {
-            // Aynı boyutta bir obje ile çarpışma başladı
             isCollidingWithSameSize = true;
             collisionStartTime = Time.time; // Çarpışma başlangıç zamanı
         }
-        
-      
     }
 
     private void OnCollisionStay2D(Collision2D collision)

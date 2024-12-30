@@ -6,6 +6,7 @@ TagManager:
   tags:
   - FallingObject
   - Ground
+  - Cat
   layers:
   - Default
   - TransparentFX

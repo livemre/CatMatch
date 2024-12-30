@@ -181,9 +181,10 @@ GameObject:
   - component: {fileID: 110200322018134843}
   - component: {fileID: 2929026114227699757}
   - component: {fileID: 172720654886653914}
+  - component: {fileID: -4361134438576213763}
   m_Layer: 0
   m_Name: Lv9
-  m_TagString: Untagged
+  m_TagString: Cat
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -275,7 +276,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: 9
-  nextObjectPrefab: {fileID: 6438845205929879973, guid: 3ba79ff7592781646a2f81731f4107b1, type: 3}
+  nextObjectPrefab: {fileID: 4216331776382283725, guid: 30c798b5d097d7b4bb1e5f27bf26fb87, type: 3}
   explosionPrefab: {fileID: 9036256428114254407, guid: 5a602661836604f99843e27f9fdfd7da, type: 3}
   isFalling: 1
   mergeSound: {fileID: 8300000, guid: 368598bc8d8a11048878eaa59c62e8ed, type: 3}
@@ -306,6 +307,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!210 &-4361134438576213763
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4216331776382283725}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 9
+  m_SortAtRoot: 0
 --- !u!1 &4516174984261222725
 GameObject:
   m_ObjectHideFlags: 0

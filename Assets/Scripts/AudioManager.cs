@@ -5,9 +5,11 @@ public class AudioManager : MonoBehaviour
     public static AudioManager Instance;
 
     private AudioSource audioSource;
+   
 
     private void Awake()
     {
+        audioSource = gameObject.AddComponent<AudioSource>();
         // Singleton Pattern
         if (Instance == null)
         {
@@ -20,10 +22,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        audioSource = gameObject.AddComponent<AudioSource>();
-    }
+   
 
     /// <summary>
     /// Ses efekti çalar.
@@ -34,6 +33,25 @@ public class AudioManager : MonoBehaviour
         if (clip != null)
         {
             audioSource.PlayOneShot(clip);
+        }
+    }
+    
+    public void PlayMusic(AudioClip clip)
+    {
+        if (clip != null)
+        {
+            
+            audioSource.PlayOneShot(clip);
+        }
+    }
+    
+    public void StopMusic()
+    {
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Stop();
+            Debug.Log("Muziği Durdur!");
+
         }
     }
 }
