@@ -603,6 +603,7 @@ GameObject:
   m_Component:
   - component: {fileID: 626630220}
   - component: {fileID: 626630219}
+  - component: {fileID: 626630221}
   m_Layer: 0
   m_Name: ObjectSpawner
   m_TagString: Untagged
@@ -626,6 +627,14 @@ MonoBehaviour:
   - {fileID: 7159154423098924749, guid: f657730adc05c8d49b03e824fbfc0bd2, type: 3}
   - {fileID: 7159154423098924749, guid: a6f9d357584ba764d84df91984e11d3c, type: 3}
   - {fileID: 4216331776382283725, guid: 78d49a10c3ecf254bbfb4a7e3973d115, type: 3}
+  - {fileID: 4216331776382283725, guid: 356c14f919453024eb53f297b0899b5e, type: 3}
+  - {fileID: 4216331776382283725, guid: f9ee4895fa91874458a2e6d97579938c, type: 3}
+  objectSprites:
+  - {fileID: 21300000, guid: 698a6765a40ba5741b1237c0ff2bd7ab, type: 3}
+  - {fileID: 21300000, guid: c9c044f183a81a64fab350ac1a54bda0, type: 3}
+  - {fileID: 21300000, guid: 04caef350f599bd469eb02c59eb0d381, type: 3}
+  - {fileID: 21300000, guid: 67a527bcc435ac54aad892eadc0c42a8, type: 3}
+  - {fileID: 21300000, guid: b46de62f1a2298e4fbefb1cce815a9ed, type: 3}
   dropLine: {fileID: 1923796858}
 --- !u!4 &626630220
 Transform:
@@ -642,6 +651,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &626630221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 626630218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: ae9cd39c8129447b48fc1c2e6053fb13, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: b2e0db71207a243649281b8240704782, type: 3}
+  m_SortingOrder: 0
 --- !u!1 &814688660
 GameObject:
   m_ObjectHideFlags: 0

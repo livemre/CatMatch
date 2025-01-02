@@ -1,8 +1,11 @@
 using UnityEngine;
+using UnityEngine.UIElements; // UI Toolkit bileşenlerini kullanmak için
 
 public class ObjectSpawner : MonoBehaviour
 {
     public GameObject[] objects; // 5 farklı boyuttaki prefab'ler
+    public Sprite[] objectSprites; // Prefab'lere karşılık gelen Sprite'lar
+    public VisualElement nextCatPreview; // UI Toolkit VisualElement referansı
     public LineRenderer dropLine; // DropLine referansı
 
     private GameObject currentObject;
@@ -14,6 +17,8 @@ public class ObjectSpawner : MonoBehaviour
     private float screenLeftLimit; // Ekranın sol sınırı
     private float screenRightLimit; // Ekranın sağ sınırı
 
+    private VisualElement root; // UI Toolkit root element
+
     void Start()
     {
         // Platformun mobil olup olmadığını belirle
@@ -21,14 +26,21 @@ public class ObjectSpawner : MonoBehaviour
 
         // Ekran sınırlarını hesapla
         Camera cam = Camera.main;
-        screenLeftLimit = cam.ScreenToWorldPoint(new Vector3(0, 0, 0)).x + 0.5f; // Biraz içeriden başla
+        screenLeftLimit = cam.ScreenToWorldPoint(new Vector3(0, 0, 0)).x + 0.5f;
         screenRightLimit = cam.ScreenToWorldPoint(new Vector3(Screen.width, 0, 0)).x - 0.5f;
 
         // İlk spawn pozisyonunu belirle
-        spawnPosition = new Vector3(0f, 5.5f, 0f); // Y ekseni sabit
+        spawnPosition = new Vector3(0f, 5.5f, 0f);
+
+        // UI Toolkit root'u bul ve nextCatPreview'ü ayarla
+        root = GetComponent<UIDocument>().rootVisualElement;
+        nextCatPreview = root.Q<VisualElement>("nextCatPreview");
 
         // İlk rastgele bir sonraki nesneyi seç
         nextObjectIndex = Random.Range(0, objects.Length);
+
+        // İlk nesnenin resmini UI'da göster
+        UpdateNextObjectImage();
 
         // İlk nesneyi spawn et
         SpawnNewObject();
@@ -147,7 +159,24 @@ public class ObjectSpawner : MonoBehaviour
         // Bir sonraki nesneyi rastgele seç
         nextObjectIndex = Random.Range(0, objects.Length);
 
+        // Bir sonraki nesnenin resmini UI'da göster
+        UpdateNextObjectImage();
+
         // DropLine'ı etkinleştir
         dropLine.enabled = true;
+    }
+
+    void UpdateNextObjectImage()
+    {
+        if (nextCatPreview != null && nextObjectIndex >= 0 && nextObjectIndex < objectSprites.Length)
+        {
+           nextCatPreview.style.backgroundImage = new StyleBackground(objectSprites[nextObjectIndex].texture);
+           Debug.Log("Resim değişiyor!  " + objectSprites[nextObjectIndex].texture);
+           
+        }
+        else
+        {
+            Debug.LogWarning("Bir sonraki objenin resmi bulunamadı!");
+        }
     }
 }

@@ -97,6 +97,10 @@ public class FallingObject : MonoBehaviour
 
             Instantiate(nextObjectPrefab, mergePos, Quaternion.identity);
 
+            // Skoru güncelle
+            int points = CalculatePoints(size);
+            UIManager.Instance.AddScore(points);
+
             Destroy(gameObject);
             Destroy(other.gameObject);
         }
@@ -112,5 +116,15 @@ public class FallingObject : MonoBehaviour
         {
             animator.SetTrigger("Stretch");
         }
+    }
+
+    /// <summary>
+    /// Puanı objenin seviyesine göre hesaplar.
+    /// </summary>
+    /// <param name="currentSize">Objenin boyutu (seviyesi).</param>
+    /// <returns>Hesaplanan puan.</returns>
+    private int CalculatePoints(int currentSize)
+    {
+        return 8 * (int)Mathf.Pow(2, currentSize - 1); // Örneğin size=1 -> 8, size=2 -> 16, size=3 -> 32
     }
 }
