@@ -2,42 +2,51 @@ using UnityEngine;
 
 public class FallingObject : MonoBehaviour
 {
-    public int size; 
+    public int size;
     public GameObject nextObjectPrefab; // Bir üst seviyedeki obje
     public GameObject explosionPrefab; // Patlama efekti
+    public Animator animator; // Animator bileşeni
+    public bool isFalling = true;
+
+    public AudioClip mergeSound; // Birleşme sırasında çalınacak ses
 
     private bool isCollidingWithSameSize = false;
-    private float collisionStartTime = 0f;
-    private FallingObject otherObject;
-    public bool isFalling = true;
-   
-    public AudioClip mergeSound; // Birleşme sırasında çalınacak ses
-    private bool hasPlayedGroundSound = false;
-   
+    private float collisionStartTime = 0f; // Çarpışma başlangıç zamanı
+    private FallingObject otherObject; // Çarpıştığı diğer obje referansı
+    private const float mergeWaitTime = 0.03f; // Birleşme için bekleme süresi
 
     private void Start()
     {
-    
+        // Animator bileşenini al
+        animator = GetComponent<Animator>();
+
         // Objeler ilk başta düşüyor olarak ayarlanır
         isFalling = true;
-        
-      
     }
-    
-  
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // Eğer objenin tag'i "Ground" ise isFalling'i false yap
-        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Cat"))
+        // Çarpışan obje ile animasyonu tetikle
+        TriggerStretchAnimation(animator);
+
+        // Çarpıştığı tüm objelerin animasyonlarını tetikle
+        foreach (ContactPoint2D contact in collision.contacts)
         {
-            if (isFalling)
+            Animator otherAnimator = contact.collider.GetComponent<Animator>();
+            if (otherAnimator != null)
             {
-                isFalling = false;
-                Debug.Log($"{gameObject.name} yere ya da bir kediye çarptı, isFalling artık false!");
+                TriggerStretchAnimation(otherAnimator);
             }
         }
 
-        // Eğer çarpan obje bir FallingObject ise ve aynı boyuttaysa birleşme kontrolü
+        // Eğer zemin ya da "Cat" tag'li bir objeye çarptıysa düşmeyi durdur
+        if (isFalling && (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Cat")))
+        {
+            Debug.Log($"{gameObject.name} yere ya da bir kediye çarptı, 'Stretch' animasyonu tetiklendi.");
+            isFalling = false;
+        }
+
+        // Aynı boyuttaki FallingObject ile çarpışma kontrolü
         otherObject = collision.gameObject.GetComponent<FallingObject>();
         if (otherObject != null && otherObject.size == size)
         {
@@ -48,24 +57,19 @@ public class FallingObject : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        // Çarpışma devam ederken kontrol et
+        // Eğer aynı boyutta bir obje ile çarpışıyorsa birleşme kontrolü
         if (isCollidingWithSameSize && otherObject != null && otherObject.size == size)
         {
             float elapsed = Time.time - collisionStartTime;
-            if (elapsed > 0.01f) 
+            if (elapsed > mergeWaitTime)
             {
-                // 0.01 saniyeyi geçti ve hala çarpışıyor, birleşme gerçekleşsin
                 MergeObjects(otherObject);
             }
         }
-        
-        
-        
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        // Çarpışma bittiğinde resetle
         FallingObject exitedObject = collision.gameObject.GetComponent<FallingObject>();
         if (exitedObject == otherObject)
         {
@@ -76,56 +80,37 @@ public class FallingObject : MonoBehaviour
 
     private void MergeObjects(FallingObject other)
     {
-        
-        // Eğer bir üst sınıf obje varsa birleşme gerçekleşir
         if (nextObjectPrefab != null)
         {
-            // Birleşme noktası
             Vector3 mergePos = (transform.position + other.transform.position) / 2f;
 
-            // Patlama efektini oluştur
             if (explosionPrefab != null)
             {
                 Instantiate(explosionPrefab, mergePos, Quaternion.identity);
             }
 
-
             AudioManager.Instance.PlaySound(mergeSound);
-            
+
 #if UNITY_ANDROID || UNITY_IOS
             Taptic.Success();
 #endif
 
-
-            // Yeni objeyi oluştur
             Instantiate(nextObjectPrefab, mergePos, Quaternion.identity);
 
-            // Puanı ekle (bir üst objenin seviyesi baz alınarak)
-            int points = CalculatePoints(size);
-            FindObjectOfType<UIManager>().AddScore(points);
-
-            // Eski objeleri yok et
             Destroy(gameObject);
             Destroy(other.gameObject);
         }
         else
         {
-            // Eğer bir üst sınıf obje yoksa, hiçbir şey yapma
-            Debug.Log($"{gameObject.name} ve {other.gameObject.name} birleşemedi çünkü üst sınıf yok.");
+            Debug.Log($"{gameObject.name} ve {other.gameObject.name} birleşemedi çünkü üst sınıf obje yok.");
         }
     }
 
-    /// <summary>
-    /// Puanı objenin seviyesine göre hesaplar.
-    /// </summary>
-    /// <param name="currentSize">Objenin boyutu (seviyesi).</param>
-    /// <returns>Hesaplanan puan.</returns>
-    private int CalculatePoints(int currentSize)
+    private void TriggerStretchAnimation(Animator animator)
     {
-        return (int)Mathf.Pow(2, currentSize + 2); // Örneğin size=1 -> 5, size=2 -> 10, size=3 -> 20
+        if (animator != null)
+        {
+            animator.SetTrigger("Stretch");
+        }
     }
-    
-    
-
-   
 }

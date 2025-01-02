@@ -658,7 +658,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d50e21fbf17b441792a43963ca88c22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  size: 11
+  size: 13
   nextObjectPrefab: {fileID: 1254677257648511346, guid: 1c5a54910c19a48798a8dfa263f966b9, type: 3}
   explosionPrefab: {fileID: 9036256428114254407, guid: 46e39a3b0d0f244d5a019a4eef024daa, type: 3}
   isFalling: 1

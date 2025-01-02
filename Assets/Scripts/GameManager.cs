@@ -50,6 +50,8 @@ public class GameManager : MonoBehaviour
         {
             UIManager.Instance.GameOver();
         }
+        
+      
     }
     
     
@@ -77,4 +79,6 @@ public class GameManager : MonoBehaviour
         //     AudioManager.Instance.PlayMusic(gameMusic);
         // }
     }
+    
+    
 }

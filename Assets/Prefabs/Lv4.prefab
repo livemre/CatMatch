@@ -252,7 +252,7 @@ Animator:
   m_GameObject: {fileID: 4216331776382283725}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 87ac7827eb5ca2e4886380f8bf787f6b, type: 2}
+  m_Controller: {fileID: 9100000, guid: fde18b70145137a4b98b8162ffa04c15, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -277,8 +277,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   size: 4
   nextObjectPrefab: {fileID: 4216331776382283725, guid: f9ee4895fa91874458a2e6d97579938c, type: 3}
-  explosionPrefab: {fileID: 9036256428114254407, guid: 5a602661836604f99843e27f9fdfd7da, type: 3}
-  isFalling: 1
+  explosionPrefab: {fileID: 9036256428114254407, guid: 8d8c565810402194c8260fb26db45b9b, type: 3}
+  animator: {fileID: 0}
+  isFalling: 0
   mergeSound: {fileID: 8300000, guid: 368598bc8d8a11048878eaa59c62e8ed, type: 3}
 --- !u!50 &172720654886653914
 Rigidbody2D:

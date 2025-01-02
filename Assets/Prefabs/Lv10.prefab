@@ -278,7 +278,7 @@ MonoBehaviour:
   size: 10
   nextObjectPrefab: {fileID: 6438845205929879973, guid: 3ba79ff7592781646a2f81731f4107b1, type: 3}
   explosionPrefab: {fileID: 9036256428114254407, guid: 5a602661836604f99843e27f9fdfd7da, type: 3}
-  isFalling: 1
+  isFalling: 0
   mergeSound: {fileID: 8300000, guid: 368598bc8d8a11048878eaa59c62e8ed, type: 3}
 --- !u!50 &172720654886653914
 Rigidbody2D:

@@ -1,17 +1,15 @@
 using UnityEngine;
-using System.Linq; // Sahnedeki objeleri filtrelemek için
 
 public class ObjectSpawner : MonoBehaviour
 {
     public GameObject[] objects; // 5 farklı boyuttaki prefab'ler
-    public LineRenderer dropLine;
+    public LineRenderer dropLine; // DropLine referansı
 
     private GameObject currentObject;
     private Vector3 spawnPosition;
 
     private int nextObjectIndex; // Bir sonraki nesneyi takip etmek için
     private bool isMobile; // Platform kontrolü için
-    private bool isDragging = false; // Parmağın hareketi kontrolü için
 
     private float screenLeftLimit; // Ekranın sol sınırı
     private float screenRightLimit; // Ekranın sağ sınırı
@@ -26,8 +24,8 @@ public class ObjectSpawner : MonoBehaviour
         screenLeftLimit = cam.ScreenToWorldPoint(new Vector3(0, 0, 0)).x + 0.5f; // Biraz içeriden başla
         screenRightLimit = cam.ScreenToWorldPoint(new Vector3(Screen.width, 0, 0)).x - 0.5f;
 
-        // Spawn konumunu biraz aşağıya ayarla
-        spawnPosition = new Vector3(0f, 30.5f, 0f); // Y değeri ayarlandı
+        // İlk spawn pozisyonunu belirle
+        spawnPosition = new Vector3(0f, 5.5f, 0f); // Y ekseni sabit
 
         // İlk rastgele bir sonraki nesneyi seç
         nextObjectIndex = Random.Range(0, objects.Length);
@@ -38,123 +36,118 @@ public class ObjectSpawner : MonoBehaviour
 
     void Update()
     {
-        if (currentObject != null)
+        if (isMobile)
         {
-            if (isMobile)
-            {
-                HandleMobileInput();
-            }
-            else
-            {
-                HandleKeyboardInput();
-            }
-
-            // DropLine pozisyonunu güncelle
-            dropLine.SetPosition(0, spawnPosition);
-            dropLine.SetPosition(1, new Vector3(spawnPosition.x, -1.75f, 1));
+            HandleMobileInput();
         }
         else
         {
-            // Eğer bir nesne bırakılmışsa, DropLine’ı gizle
-            dropLine.enabled = false;
+            HandleMouseInput();
+            HandleKeyboardInput(); // Klavye girdilerini işle
+        }
+
+        // DropLine pozisyonunu güncelle
+        if (currentObject != null)
+        {
+            dropLine.SetPosition(0, new Vector3(currentObject.transform.position.x, currentObject.transform.position.y, 0));
+            dropLine.SetPosition(1, new Vector3(currentObject.transform.position.x, -1.75f, 0));
         }
     }
 
-    void HandleMobileInput()
+    void HandleMouseInput()
     {
-        float sensitivity = 0.005f; // Parmağın hareketine hassasiyet. Daha küçük bir değer hareketi yavaşlatır.
-
-        if (Input.touchCount > 0)
+        if (Input.GetMouseButtonDown(0)) // Sol fare tıklaması
         {
-            Touch touch = Input.GetTouch(0);
+            Vector3 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            float clampedX = Mathf.Clamp(worldPoint.x, screenLeftLimit, screenRightLimit);
 
-            if (touch.phase == TouchPhase.Began)
+            // Tıklanan pozisyonu başlangıç olarak ayarla
+            spawnPosition.x = clampedX;
+
+            if (currentObject != null)
             {
-                // Parmağın dokunması başladığında
-                isDragging = true;
-            }
-            else if (touch.phase == TouchPhase.Moved && isDragging)
-            {
-                // Parmağın hareketi sırasında objeyi sağa sola taşı
-                float moveAmount = touch.deltaPosition.x * sensitivity; // Hareket miktarını hassasiyetle kontrol et
-                spawnPosition.x = Mathf.Clamp(spawnPosition.x + moveAmount, screenLeftLimit, screenRightLimit);
-                currentObject.transform.position = spawnPosition;
-            }
-            else if (touch.phase == TouchPhase.Ended)
-            {
-                // Parmağı ekrandan kaldırınca topu bırak
-                isDragging = false;
+                currentObject.transform.position = new Vector3(spawnPosition.x, spawnPosition.y, 0);
                 DropObject();
             }
         }
     }
 
-
     void HandleKeyboardInput()
     {
-        // Sağ-Sol Hareket
-        float move = Input.GetAxis("Horizontal") * Time.deltaTime * 10f;
+        float move = Input.GetAxis("Horizontal") * Time.deltaTime * 10f; // Klavyeden sağ-sol hareket
         spawnPosition.x = Mathf.Clamp(spawnPosition.x + move, screenLeftLimit, screenRightLimit);
-        currentObject.transform.position = spawnPosition;
 
-        if (Input.GetMouseButtonDown(0))
+        if (currentObject != null)
         {
-            // Fare tıklamasıyla objeyi serbest bırak
-            DropObject();
+            currentObject.transform.position = new Vector3(spawnPosition.x, spawnPosition.y, 0);
+        }
+    }
+
+    void HandleMobileInput()
+    {
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+
+            if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Moved)
+            {
+                Vector3 worldPoint = Camera.main.ScreenToWorldPoint(touch.position);
+                float clampedX = Mathf.Clamp(worldPoint.x, screenLeftLimit, screenRightLimit);
+
+                // Dokunulan pozisyonu başlangıç olarak ayarla
+                spawnPosition.x = clampedX;
+
+                if (currentObject != null)
+                {
+                    currentObject.transform.position = new Vector3(spawnPosition.x, spawnPosition.y, 0);
+                }
+            }
+            else if (touch.phase == TouchPhase.Ended)
+            {
+                // Parmağı kaldırınca objeyi bırak
+                if (currentObject != null)
+                {
+                    DropObject();
+                }
+            }
         }
     }
 
     void DropObject()
     {
+        // Objenin fiziksel olarak düşmesini sağla
         currentObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
-        currentObject = null;
-        Invoke(nameof(SpawnNewObject), 1f); // Yeni nesneyi çağır
-    }
 
-    
-   
+        // DropLine pozisyonunu düşen objeye göre ayarla
+        dropLine.SetPosition(0, new Vector3(currentObject.transform.position.x, currentObject.transform.position.y, 0));
+        dropLine.SetPosition(1, new Vector3(currentObject.transform.position.x, -1.75f, 0));
+
+        currentObject = null;
+        dropLine.enabled = false; // DropLine'ı devre dışı bırak
+
+        // Yeni kediyi her zaman ekranın ortasından başlatmak için pozisyonu sıfırla
+        spawnPosition = new Vector3(0f, 5.5f, 0f);
+
+        // Yeni nesne oluşturma işlemini zamanla
+        Invoke(nameof(SpawnNewObject), 1f);
+    }
 
     void SpawnNewObject()
     {
-        
-        // Eğer oyun bitti ise obje spawnlanmasın
-        if (GameManager.Instance.isGameOver)
+        if (GameManager.Instance != null && GameManager.Instance.isGameOver)
         {
             Debug.Log("Oyun bitti, yeni obje spawnlanmayacak.");
             return;
         }
-        
-        
-        // Sahnedeki kedilerin en yüksek seviyesini kontrol et
-        int maxLevel = GameObject.FindGameObjectsWithTag("Cat")
-            .Select(cat => cat.GetComponent<FallingObject>().size)
-            .DefaultIfEmpty(0) // Eğer sahnede kedi yoksa 0 döner
-            .Max();
-
-        // Spawn edilecek nesneyi belirle
-        if (maxLevel >= 9)
-        {
-            nextObjectIndex = Random.Range(0, 5); // Element1, Element2, Element3, Element4 veya Element5
-        }
-        else if (maxLevel >= 7)
-        {
-            nextObjectIndex = Random.Range(0, 4); // Element1, Element2, Element3 veya Element4
-        }
-        else
-        {
-            nextObjectIndex = Random.Range(0, 3); // Element1, Element2 veya Element3
-        }
-
-        spawnPosition.y = 5.5f; // Nesne biraz aşağıdan başlar
 
         // Yeni nesneyi spawn et
         currentObject = Instantiate(objects[nextObjectIndex], spawnPosition, Quaternion.identity);
         currentObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
 
-        // DropLine'ı yeniden etkinleştir ve yeni pozisyonu ayarla
-        dropLine.enabled = true;
+        // Bir sonraki nesneyi rastgele seç
+        nextObjectIndex = Random.Range(0, objects.Length);
 
-        // UI'yi güncelle
-        FindObjectOfType<UIManager>().UpdateNextCatUI(objects[nextObjectIndex]);
+        // DropLine'ı etkinleştir
+        dropLine.enabled = true;
     }
 }
